@@ -74,9 +74,621 @@
   justify-content: center;
 }
 
+/* 3D フリップアニメーション用 */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* カスタムスクロールバー */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ホバーエフェクト */
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* グラデーションアニメーション */
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* パルスアニメーション */
+.pulse-slow {
+  animation: pulse 3s infinite;
+}
+
+/* フェードイン */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* スライドイン */
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* 成功アニメーション */
+.success-bounce {
+  animation: successBounce 0.6s ease-out;
+}
+
+@keyframes successBounce {
+  0% { transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* エラーシェイク */
+.error-shake {
+  animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* フラッシュカード専用スタイル */
+.flashcard-container {
+  perspective: 1000px;
+}
+
+.flashcard {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.flashcard-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.flashcard-back {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  transform: rotateY(180deg);
+}
+
+/* クイズ選択肢のアニメーション */
+.quiz-option {
+  transition: all 0.2s ease;
+}
+
+.quiz-option:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-option.correct {
+  animation: correctPulse 0.6s ease;
+}
+
+.quiz-option.incorrect {
+  animation: incorrectShake 0.5s ease;
+}
+
+@keyframes correctPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes incorrectShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* 学習統計グラフ */
+.stats-bar {
+  transition: height 0.8s ease, background-color 0.3s ease;
+}
+
+.stats-bar:hover {
+  opacity: 0.8;
+}
+
+/* プログレスリング */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dasharray 0.35s;
+  transform-origin: 50% 50%;
+}
+
+/* モチベーション要素 */
+.achievement-badge {
+  animation: badgeAppear 0.8s ease-out;
+}
+
+@keyframes badgeAppear {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .mobile-hide {
+    display: none;
+  }
+  
+  .mobile-full {
+    width: 100%;
+  }
+  
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .ad-sidebar {
+    min-height: 150px;
+  }
+  
+  .flashcard {
+    height: 200px;
+  }
+  
+  .flashcard-face {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .flashcard {
+    height: 180px;
+  }
+  
+  .quiz-option {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+}
+
+/* ダークモード対応（将来の拡張用） */
+@media (prefers-color-scheme: dark) {
+  .dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .dark-mode .bg-white {
+    background-color: #2d2d2d;
+  }
+  
+  .dark-mode .text-gray-800 {
+    color: #e5e5e5;
+  }
+  
+  .dark-mode .text-gray-600 {
+    color: #a0a0a0;
+  }
+}
+
+/* 印刷対応 */
+@media print {
+  .no-print {
+    display: none;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+/* アクセシビリティ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* フォーカス表示の改善 */
+.focus-visible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* カスタムツールチップ */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* 実績通知アニメーション */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+/* ペットアニメーション */
+@keyframes petBounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.animate-pet-bounce {
+  animation: petBounce 1s ease-in-out;
+}
+
+/* バッジ獲得アニメーション */
+@keyframes badgeGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.badge-glow {
+  animation: badgeGlow 2s ease-in-out infinite;
+}
+
+/* 3Dフリップアニメーション用のCSS */
+.rotateY-180 {
+  transform: rotateY(180deg);
+}
+
+/* 3D変換のサポート */
+[style*="perspective"] {
+  transform-style: preserve-3d;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* スマホでのタップ時のハイライトを無効化 */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    padding: 0.5rem 1rem;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900 hover:bg-gray-200;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700;
+  }
+  
+  .btn-lg {
+    @apply text-base px-6 py-3;
+  }
+  
+  .card {
+    @apply rounded-lg border bg-white p-6 shadow-sm;
+  }
+  
+  .input {
+    @apply flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  /* スマホ最適化 */
+  @media (max-width: 640px) {
+    .btn {
+      @apply text-sm px-4 py-2;
+    }
+    
+    .btn-lg {
+      @apply text-base px-5 py-3;
+    }
+    
+    .card {
+      @apply p-4;
+    }
+  }
+}
+
+/* カスタムアニメーション */
+.timer-circle {
+  transition: stroke-dasharray 0.3s ease;
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* 広告スタイル */
+.ad-banner {
+  @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-sidebar {
+  @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-rectangle {
+  @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .ad-sidebar {
     min-height: 150px;
+  }
+  
+  .ad-banner {
+    min-height: 60px;
+  }
+  
+  /* スマホでのフォントサイズ調整 */
+  h1 {
+    @apply text-2xl;
+  }
+  
+  h2 {
+    @apply text-xl;
+  }
+  
+  h3 {
+    @apply text-lg;
+  }
+}
+
+/* タッチデバイス用の改善 */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:bg-blue-50:hover {
+    background-color: rgb(239 246 255);
+  }
+  
+  .hover\:border-blue-500:hover {
+    border-color: rgb(59 130 246);
+  }
+  
+  /* タッチ時のフィードバック */
+  button:active {
+    transform: scale(0.98);
+  }
+}
+
+/* スクロールバーのスタイリング（Webkit系ブラウザ） */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* フォーカス時のアウトライン改善 */
+.focus\:ring-2:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #3b82f6;
+  outline-offset: 2px;
+}
+
+/* カスタムツールチップ */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* スマホ向けの追加スタイル */
+@media (max-width: 640px) {
+  /* より大きなタッチターゲット */
+  button {
+    min-height: 44px;
+  }
+  
+  input {
+    min-height: 44px;
+  }
+  
+  /* スマホでのマージン調整 */
+  .container {
+    @apply px-4;
+  }
+  
+  /* モーダルのスマホ最適化 */
+  .modal {
+    @apply m-4;
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+/* 横向きスマホ対応 */
+@media (max-width: 896px) and (orientation: landscape) {
+  .min-h-screen {
+    min-height: 100vh;
+  }
+}
+
+/* 高解像度ディスプレイ対応 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 高解像度での調整 */
+  .border {
+    border-width: 0.5px;
   }
 }
