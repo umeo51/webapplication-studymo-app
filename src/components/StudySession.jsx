@@ -1,168 +1,135 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { learningContent } from '../data/learningContent';
+import React, { useState, useEffect } from 'react';
+import { useStudySession } from '../contexts/StudySessionContext';
+import QuizQuestion from './QuizQuestion';
+import FlashCard from './FlashCard';
 
-const StudySessionContext = createContext();
+const StudySession = ({ category, onComplete }) => {
+  const { currentSession, recordResponse, nextItem, endSession } = useStudySession();
+  const [currentQuestionStartTime, setCurrentQuestionStartTime] = useState(Date.now());
+  const [showResult, setShowResult] = useState(false);
+  const [lastAnswer, setLastAnswer] = useState(null);
 
-export const useStudySession = () => {
-  const context = useContext(StudySessionContext);
-  if (!context) {
-    throw new Error('useStudySession must be used within a StudySessionProvider');
+  useEffect(() => {
+    setCurrentQuestionStartTime(Date.now());
+  }, [currentSession?.currentIndex]);
+
+  if (!currentSession?.isActive) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">学習セッションを開始してください</h2>
+          <p className="text-gray-600">カテゴリを選択して学習を始めましょう。</p>
+        </div>
+      </div>
+    );
   }
-  return context;
-};
 
-export const StudySessionProvider = ({ children }) => {
-  const [currentSession, setCurrentSession] = useState({
-    isActive: false,
-    category: null,
-    mode: 'quiz', // 'quiz'のみに変更
-    sessionItems: [],
-    itemIndex: 0,
-    responses: [],
-    stats: {
-      correctAnswers: 0,
-      totalAnswers: 0,
-      totalTime: 0
-    },
-    startTime: null
-  });
+  const currentItem = currentSession.items[currentSession.currentIndex];
+  const progress = ((currentSession.currentIndex + 1) / currentSession.items.length) * 100;
 
-  const [userProgress, setUserProgress] = useState({
-    programming: { attempted: 0, correct: 0, level: 1, xp: 0 },
-    english: { attempted: 0, correct: 0, level: 1, xp: 0 },
-    business: { attempted: 0, correct: 0, level: 1, xp: 0 },
-    design: { attempted: 0, correct: 0, level: 1, xp: 0 },
-    marketing: { attempted: 0, correct: 0, level: 1, xp: 0 },
-    finance: { attempted: 0, correct: 0, level: 1, xp: 0 }
-  });
-
-  const [detailedStats, setDetailedStats] = useState({
-    dailyStats: {},
-    weeklyStats: {},
-    categoryPerformance: {}
-  });
-
-  // セッション開始関数
-  const startSession = (categoryKey, mode = 'quiz', itemCount = 10) => {
-    console.log('Starting session:', { categoryKey, mode, itemCount }); // デバッグ用
-
-    const category = learningContent[categoryKey];
-    if (!category) {
-      console.error('Category not found:', categoryKey);
-      return;
-    }
-
-    // クイズのみを使用
-    const availableItems = category.quizzes || [];
+  const handleAnswer = (answer, isCorrect, responseTime = null) => {
+    const actualResponseTime = responseTime || (Date.now() - currentQuestionStartTime);
     
-    if (availableItems.length === 0) {
-      console.error('No quizzes available for category:', categoryKey);
-      return;
-    }
+    setLastAnswer({ answer, isCorrect });
+    setShowResult(true);
 
-    // ランダムに問題を選択
-    const shuffledItems = [...availableItems].sort(() => Math.random() - 0.5);
-    const sessionItems = shuffledItems.slice(0, Math.min(itemCount, shuffledItems.length));
-
-    console.log('Session items:', sessionItems); // デバッグ用
-
-    setCurrentSession({
-      isActive: true,
-      category: category.name,
-      categoryKey: categoryKey,
-      mode: 'quiz',
-      sessionItems: sessionItems,
-      itemIndex: 0,
-      responses: [],
-      stats: {
-        correctAnswers: 0,
-        totalAnswers: 0,
-        totalTime: 0
-      },
-      startTime: Date.now()
-    });
-  };
-
-  // 回答記録関数
-  const recordResponse = (itemId, isCorrect, timeSpent) => {
-    setCurrentSession(prev => {
-      const newResponses = [...prev.responses, {
-        itemId,
-        isCorrect,
-        timeSpent,
-        timestamp: Date.now()
-      }];
-
-      const newStats = {
-        correctAnswers: prev.stats.correctAnswers + (isCorrect ? 1 : 0),
-        totalAnswers: prev.stats.totalAnswers + 1,
-        totalTime: prev.stats.totalTime + timeSpent
-      };
-
-      return {
-        ...prev,
-        responses: newResponses,
-        stats: newStats
-      };
+    recordResponse({
+      itemId: currentItem.id,
+      answer,
+      isCorrect,
+      responseTime: actualResponseTime
     });
 
-    // ユーザー進捗を更新
-    setUserProgress(prev => {
-      const categoryKey = currentSession.categoryKey;
-      if (!categoryKey || !prev[categoryKey]) return prev;
-
-      return {
-        ...prev,
-        [categoryKey]: {
-          ...prev[categoryKey],
-          attempted: prev[categoryKey].attempted + 1,
-          correct: prev[categoryKey].correct + (isCorrect ? 1 : 0),
-          xp: prev[categoryKey].xp + (isCorrect ? 10 : 5)
+    setTimeout(() => {
+      setShowResult(false);
+      if (currentSession.currentIndex < currentSession.items.length - 1) {
+        nextItem();
+      } else {
+        endSession();
+        if (onComplete) {
+          onComplete();
         }
-      };
-    });
-  };
-
-  // 次のアイテムに進む
-  const nextItem = () => {
-    setCurrentSession(prev => ({
-      ...prev,
-      itemIndex: prev.itemIndex + 1
-    }));
-  };
-
-  // セッション終了
-  const endSession = () => {
-    setCurrentSession({
-      isActive: false,
-      category: null,
-      categoryKey: null,
-      mode: 'quiz',
-      sessionItems: [],
-      itemIndex: 0,
-      responses: [],
-      stats: {
-        correctAnswers: 0,
-        totalAnswers: 0,
-        totalTime: 0
-      },
-      startTime: null
-    });
-  };
-
-  const value = {
-    currentSession,
-    userProgress,
-    detailedStats,
-    startSession,
-    recordResponse,
-    nextItem,
-    endSession
+      }
+    }, 2000);
   };
 
   return (
-    <StudySessionContext.Provider value={value}>
-      {children}
-    </StudySessionContext.Provider>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* ヘッダー */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">📚</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-800">{currentSession.category}</h1>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-gray-600">正解: {currentSession.correctAnswers} / {currentSession.currentIndex}</div>
+            </div>
+          </div>
+          
+          {/* プログレスバー */}
+          <div className="mb-4">
+            <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <span>問題 {currentSession.currentIndex + 1} / {currentSession.items.length}</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 結果表示オーバーレイ */}
+        {showResult && lastAnswer && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className={`bg-white rounded-2xl p-8 text-center max-w-md mx-4 transform transition-all duration-300 ${
+              showResult ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            }`}>
+              <div className={`text-6xl mb-4 ${lastAnswer.isCorrect ? 'text-green-500' : 'text-red-500'}`}>
+                {lastAnswer.isCorrect ? '✅' : '❌'}
+              </div>
+              <h3 className={`text-2xl font-bold mb-2 ${
+                lastAnswer.isCorrect ? 'text-green-700' : 'text-red-700'
+              }`}>
+                {lastAnswer.isCorrect ? '正解！' : '不正解'}
+              </h3>
+              {!lastAnswer.isCorrect && (
+                <p className="text-gray-600 mb-4">
+                  正解: {currentItem.correctAnswer || currentItem.answer}
+                </p>
+              )}
+              <div className="text-sm text-gray-500">
+                次の問題に進みます...
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 問題表示 */}
+        <div className="max-w-4xl mx-auto">
+          {currentItem.type === 'quiz' ? (
+            <QuizQuestion
+              question={currentItem}
+              onAnswer={handleAnswer}
+              disabled={showResult}
+            />
+          ) : (
+            <FlashCard
+              card={currentItem}
+              onAnswer={handleAnswer}
+              disabled={showResult}
+            />
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
+
+export default StudySession;
