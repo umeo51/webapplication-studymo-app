@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { LearningProvider } from './contexts/LearningContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
@@ -13,7 +13,9 @@ import TermsOfService from './components/TermsOfService';
 import LearningGuide from './components/LearningGuide';
 import Contact from './components/Contact';
 import { useStudySession } from './contexts/StudySessionContext';
-import QuizQuestion from './components/QuizQuestion';// learningContentを直接定義
+import QuizQuestion from './components/QuizQuestion';
+
+// learningContentを直接定義
 const learningContent = {
   programming: {
     name: 'プログラミング',
@@ -108,312 +110,249 @@ const learningContent = {
 
 // メインアプリケーションコンポーネント
 const MainApp = () => {
+  const { currentSession, startSession } = useStudySession();
   const [currentView, setCurrentView] = useState('home');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [sessionResults, setSessionResults] = useState(null);
-  const { startSession, userProgress } = useStudySession();
 
-  const handleStartSession = (category) => {
-    setSelectedCategory(category);
-    startSession(category);
+  const handleCategorySelect = (categoryKey) => {
+    console.log('Category selected:', categoryKey);
+    setSelectedCategory(categoryKey);
+    startSession(categoryKey, 'quiz', 10);
     setCurrentView('session');
   };
 
-  const handleSessionComplete = (results) => {
-    setSessionResults(results);
+  const handleRandomStart = () => {
+    const categories = Object.keys(learningContent);
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    handleCategorySelect(randomCategory);
+  };
+
+  const handleSessionComplete = () => {
     setCurrentView('summary');
   };
 
-  const handleSummaryClose = () => {
+  const handleBackToHome = () => {
     setCurrentView('home');
-    setSessionResults(null);
     setSelectedCategory(null);
   };
 
-  const handleRetrySession = () => {
-    if (selectedCategory) {
-      startSession(selectedCategory);
-      setCurrentView('session');
-      setSessionResults(null);
-    }
-  };
+  if (currentView === 'session' && currentSession?.isActive) {
+    return (
+      <StudySession 
+        category={selectedCategory}
+        onComplete={handleSessionComplete}
+      />
+    );
+  }
 
-  // ナビゲーションメニュー
-  const NavigationMenu = () => (
-    <nav className="bg-white shadow-sm border-b border-gray-200 mb-6">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
-            <button
-              onClick={() => setCurrentView('home')}
-              className="text-2xl font-bold text-blue-600 hover:text-blue-700"
-            >
-              Studymo
-            </button>
-            <div className="hidden md:flex space-x-6">
-              <button
-                onClick={() => setCurrentView('home')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  currentView === 'home' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                ホーム
-              </button>
-              <button
-                onClick={() => setCurrentView('analytics')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  currentView === 'analytics' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                学習分析
-              </button>
-              <button
-                onClick={() => setCurrentView('guide')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  currentView === 'guide' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                学習ガイド
+  if (currentView === 'summary') {
+    return (
+      <SessionSummary 
+        onBackToHome={handleBackToHome}
+      />
+    );
+  }
+
+  if (currentView === 'analytics') {
+    return <AnalyticsDashboard onBack={() => setCurrentView('home')} />;
+  }
+
+  if (currentView === 'guide') {
+    return <LearningGuide onBack={() => setCurrentView('home')} />;
+  }
+
+  if (currentView === 'privacy') {
+    return <PrivacyPolicy onBack={() => setCurrentView('home')} />;
+  }
+
+  if (currentView === 'terms') {
+    return <TermsOfService onBack={() => setCurrentView('home')} />;
+  }
+
+  if (currentView === 'contact') {
+    return <Contact onBack={() => setCurrentView('home')} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* ヘッダー */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <h1 className="text-2xl font-bold text-blue-600 cursor-pointer" onClick={() => setCurrentView('home')}>
+                Studymo
+              </h1>
+              <nav className="hidden md:flex space-x-6">
+                <button 
+                  onClick={() => setCurrentView('home')}
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  ホーム
+                </button>
+                <button 
+                  onClick={() => setCurrentView('analytics')}
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  学習分析
+                </button>
+                <button 
+                  onClick={() => setCurrentView('guide')}
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  学習ガイド
+                </button>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">
+                今日の学習: 0分　連続: 0日
+              </div>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                プレミアム
               </button>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-4 text-sm text-gray-600">
-              <span>今日の学習: {getTodayStudyTime()}分</span>
-              <span>連続: {getStudyStreak()}日</span>
-            </div>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-              プレミアム
-            </button>
           </div>
         </div>
-      </div>
-    </nav>
-  );
+      </header>
 
-  const getTodayStudyTime = () => {
-    // 今日の学習時間を計算（プレースホルダー）
-    return Math.floor(Math.random() * 60);
-  };
-
-  const getStudyStreak = () => {
-    // 学習ストリークを計算（プレースホルダー）
-    return Math.floor(Math.random() * 30);
-  };
-
-  // ホーム画面
-  const HomeView = () => (
-    <div className="max-w-7xl mx-auto px-4">
-      {/* 広告バナー */}
-      <div className="mb-8">
-        <AdBanner type="banner" className="mx-auto" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* メインコンテンツ */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* 今日の学習セッション */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">今日の学習セッション</h2>
-            <p className="text-gray-600 mb-6">15分の集中学習でスキルを身につけましょう</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          {/* メインコンテンツ */}
+          <div className="flex-1">
+            <AdBanner position="banner" />
             
-            {/* 学習カテゴリ */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">今日の学習セッション</h2>
+              <p className="text-gray-600">15分の集中学習でスキルを身につけましょう</p>
+            </div>
+
+            {/* カテゴリグリッド */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {Object.entries(learningContent).map(([key, category]) => {
-                const progress = userProgress[key] || { attempted: 0, correct: 0 };
-                const accuracy = progress.attempted > 0 
-                  ? Math.round((progress.correct / progress.attempted) * 100) 
-                  : 0;
+                const categoryStats = {
+                  questionsAnswered: 0,
+                  correctRate: 0
+                };
 
                 return (
-                  <button
+                  <div
                     key={key}
-                    onClick={() => handleStartSession(key)}
-                    className="group bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 border-2 border-gray-200 hover:border-blue-300 rounded-lg p-6 transition-all duration-200 transform hover:scale-105"
+                    onClick={() => handleCategorySelect(key)}
+                    className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-200"
                   >
                     <div className="text-center">
                       <div className="text-4xl mb-3">{category.icon}</div>
-                      <h3 className="font-semibold text-gray-800 group-hover:text-blue-700 mb-2">
-                        {category.name}
-                      </h3>
-                      <div className="text-sm text-gray-600">
-                        <div>学習済み: {progress.attempted}問</div>
-                        <div>正答率: {accuracy}%</div>
-                      </div>
-                      <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full bg-${category.color}-500 transition-all`}
-                          style={{ width: `${Math.min(accuracy, 100)}%` }}
-                        />
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">{category.name}</h3>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <div>学習済み: {categoryStats.questionsAnswered}問</div>
+                        <div>正答率: {categoryStats.correctRate}%</div>
                       </div>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
 
-            {/* クイックスタートボタン */}
-            <div className="text-center">
+            {/* ランダム学習ボタン */}
+            <div className="text-center mb-8">
               <button
-                onClick={() => {
-                  const categories = Object.keys(learningContent);
-                  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                  handleStartSession(randomCategory);
-                }}
-                className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg"
+                onClick={handleRandomStart}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 🎲 ランダム学習開始
               </button>
             </div>
           </div>
 
-          {/* 学習統計プレビュー */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">学習統計</h2>
-              <button
-                onClick={() => setCurrentView('analytics')}
-                className="text-blue-500 hover:text-blue-600 text-sm font-medium"
-              >
-                詳細を見る →
-              </button>
-            </div>
+          {/* サイドバー */}
+          <div className="w-80 space-y-6">
+            <AdBanner position="sidebar" />
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {Object.values(userProgress).reduce((sum, cat) => sum + cat.attempted, 0)}
+            {/* 今週の目標 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">今週の目標</h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>学習時間</span>
+                    <span>0/300分</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '0%'}}></div>
+                  </div>
                 </div>
-                <div className="text-sm text-blue-800">総学習数</div>
+                <div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>学習日数</span>
+                    <span>0/7日</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{width: '0%'}}></div>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">
-                  {Object.values(userProgress).reduce((sum, cat) => sum + cat.correct, 0)}
+            </div>
+
+            {/* 最近の成果 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">最近の成果</h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    🏆
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">7日連続学習達成！</div>
+                    <div className="text-xs text-gray-500">24時間前</div>
+                  </div>
                 </div>
-                <div className="text-sm text-green-800">正解数</div>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">
-                  {getStudyStreak()}
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    🎯
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">プログラミング正答率90%</div>
+                    <div className="text-xs text-gray-500">昨日</div>
+                  </div>
                 </div>
-                <div className="text-sm text-purple-800">連続日数</div>
-              </div>
-              <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600">
-                  {getTodayStudyTime()}
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    📚
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">100問学習完了</div>
+                    <div className="text-xs text-gray-500">3日前</div>
+                  </div>
                 </div>
-                <div className="text-sm text-orange-800">今日の学習時間</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* サイドバー */}
-        <div className="space-y-6">
-          {/* 広告サイドバー */}
-          <AdBanner type="sidebar" />
-
-          {/* 学習目標 */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="font-semibold text-gray-800 mb-4">今週の目標</h3>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>学習時間</span>
-                  <span>{getTodayStudyTime()}/300分</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: `${Math.min((getTodayStudyTime() / 300) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>学習日数</span>
-                  <span>{Math.min(getStudyStreak(), 7)}/7日</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${Math.min((getStudyStreak() / 7) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
+        {/* フッター */}
+        <footer className="mt-16 py-8 border-t border-gray-200">
+          <div className="flex justify-center space-x-6 text-sm text-gray-600">
+            <button onClick={() => setCurrentView('privacy')} className="hover:text-blue-600">
+              プライバシーポリシー
+            </button>
+            <button onClick={() => setCurrentView('terms')} className="hover:text-blue-600">
+              利用規約
+            </button>
+            <button onClick={() => setCurrentView('contact')} className="hover:text-blue-600">
+              お問い合わせ
+            </button>
           </div>
-
-          {/* 最近の成果 */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="font-semibold text-gray-800 mb-4">最近の成果</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <span className="text-2xl">🏆</span>
-                <div>
-                  <div className="font-medium text-sm">7日連続学習達成！</div>
-                  <div className="text-xs text-gray-500">2時間前</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-2xl">🎯</span>
-                <div>
-                  <div className="font-medium text-sm">プログラミング正答率90%</div>
-                  <div className="text-xs text-gray-500">昨日</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-2xl">📚</span>
-                <div>
-                  <div className="font-medium text-sm">100問学習完了</div>
-                  <div className="text-xs text-gray-500">3日前</div>
-                </div>
-              </div>
-            </div>
+          <div className="text-center mt-4 text-xs text-gray-500">
+            © 2024 Studymo. All rights reserved.
           </div>
-        </div>
+        </footer>
       </div>
-    </div>
-  );
-
-  // メインレンダリング
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <NavigationMenu />
-      
-      {currentView === 'home' && <HomeView />}
-      {currentView === 'session' && selectedCategory && (
-        <StudySession 
-          category={selectedCategory} 
-          onComplete={handleSessionComplete}
-        />
-      )}
-      {currentView === 'analytics' && <AnalyticsDashboard />}
-      {currentView === 'guide' && <LearningGuide />}
-      {currentView === 'privacy' && <PrivacyPolicy />}
-      {currentView === 'terms' && <TermsOfService />}
-      {currentView === 'contact' && <Contact />}
-      
-      {sessionResults && (
-        <SessionSummary
-          results={sessionResults}
-          category={selectedCategory}
-          onClose={handleSummaryClose}
-          onRetry={handleRetrySession}
-        />
-      )}
     </div>
   );
 };
 
-// ルートアプリケーションコンポーネント
+// アプリケーションのルートコンポーネント
 function App() {
   return (
     <AuthProvider>
