@@ -15,7 +15,7 @@ import Contact from './components/Contact';
 import { useStudySession } from './contexts/StudySessionContext';
 import QuizQuestion from './components/QuizQuestion';
 
-// learningContentを直接定義
+// learningContentを直接定義（複数問題を追加）
 const learningContent = {
   programming: {
     name: 'プログラミング',
@@ -29,6 +29,42 @@ const learningContent = {
         correctAnswer: 'font-size',
         difficulty: '初級',
         tags: ['CSS', 'フォント']
+      },
+      {
+        id: 'prog_2',
+        type: 'quiz',
+        question: 'CSSでボックスモデルに含まれないものはどれですか？',
+        options: ['margin', 'padding', 'border', 'font-family'],
+        correctAnswer: 'font-family',
+        difficulty: '中級',
+        tags: ['CSS', 'ボックスモデル']
+      },
+      {
+        id: 'prog_3',
+        type: 'quiz',
+        question: 'HTMLで段落を表すタグはどれですか？',
+        options: ['<div>', '<p>', '<span>', '<section>'],
+        correctAnswer: '<p>',
+        difficulty: '初級',
+        tags: ['HTML', '基本']
+      },
+      {
+        id: 'prog_4',
+        type: 'quiz',
+        question: 'JavaScriptで変数を宣言するキーワードはどれですか？',
+        options: ['var', 'variable', 'declare', 'define'],
+        correctAnswer: 'var',
+        difficulty: '初級',
+        tags: ['JavaScript', '変数']
+      },
+      {
+        id: 'prog_5',
+        type: 'quiz',
+        question: 'CSSでテキストを中央揃えにするプロパティはどれですか？',
+        options: ['text-align: center', 'align: center', 'center: true', 'text-center: yes'],
+        correctAnswer: 'text-align: center',
+        difficulty: '初級',
+        tags: ['CSS', 'テキスト']
       }
     ]
   },
@@ -41,6 +77,40 @@ const learningContent = {
         type: 'input',
         question: 'こんにちはを英語で言うと？',
         correctAnswer: 'Hello',
+        difficulty: '初級',
+        tags: ['挨拶', '基礎']
+      },
+      {
+        id: 'eng_2',
+        type: 'quiz',
+        question: 'ありがとうの英語は？',
+        options: ['Thank you', 'Please', 'Sorry', 'Excuse me'],
+        correctAnswer: 'Thank you',
+        difficulty: '初級',
+        tags: ['挨拶', '基礎']
+      },
+      {
+        id: 'eng_3',
+        type: 'input',
+        question: 'さようならを英語で言うと？',
+        correctAnswer: 'Goodbye',
+        difficulty: '初級',
+        tags: ['挨拶', '基礎']
+      },
+      {
+        id: 'eng_4',
+        type: 'quiz',
+        question: 'すみませんの英語は？',
+        options: ['Excuse me', 'Thank you', 'Hello', 'Goodbye'],
+        correctAnswer: 'Excuse me',
+        difficulty: '初級',
+        tags: ['挨拶', '基礎']
+      },
+      {
+        id: 'eng_5',
+        type: 'input',
+        question: 'おはようございますを英語で言うと？',
+        correctAnswer: 'Good morning',
         difficulty: '初級',
         tags: ['挨拶', '基礎']
       }
@@ -58,6 +128,42 @@ const learningContent = {
         correctAnswer: 'Plan',
         difficulty: '初級',
         tags: ['PDCA', '基礎']
+      },
+      {
+        id: 'biz_2',
+        type: 'quiz',
+        question: 'PDCAサイクルのDは何を表しますか？',
+        options: ['Do', 'Design', 'Develop', 'Decide'],
+        correctAnswer: 'Do',
+        difficulty: '初級',
+        tags: ['PDCA', '基礎']
+      },
+      {
+        id: 'biz_3',
+        type: 'quiz',
+        question: 'PDCAサイクルのCは何を表しますか？',
+        options: ['Check', 'Create', 'Change', 'Control'],
+        correctAnswer: 'Check',
+        difficulty: '初級',
+        tags: ['PDCA', '基礎']
+      },
+      {
+        id: 'biz_4',
+        type: 'quiz',
+        question: 'PDCAサイクルのAは何を表しますか？',
+        options: ['Action', 'Analyze', 'Approve', 'Apply'],
+        correctAnswer: 'Action',
+        difficulty: '初級',
+        tags: ['PDCA', '基礎']
+      },
+      {
+        id: 'biz_5',
+        type: 'quiz',
+        question: 'KPIは何の略ですか？',
+        options: ['Key Performance Indicator', 'Key Process Improvement', 'Key Product Information', 'Key Project Initiative'],
+        correctAnswer: 'Key Performance Indicator',
+        difficulty: '中級',
+        tags: ['KPI', '指標']
       }
     ]
   },
@@ -73,6 +179,42 @@ const learningContent = {
         correctAnswer: 'Red',
         difficulty: '初級',
         tags: ['色彩', 'RGB']
+      },
+      {
+        id: 'design_2',
+        type: 'quiz',
+        question: 'RGBカラーモデルでGは何を表しますか？',
+        options: ['Green', 'Gray', 'Gold', 'Gradient'],
+        correctAnswer: 'Green',
+        difficulty: '初級',
+        tags: ['色彩', 'RGB']
+      },
+      {
+        id: 'design_3',
+        type: 'quiz',
+        question: 'RGBカラーモデルでBは何を表しますか？',
+        options: ['Blue', 'Black', 'Bold', 'Border'],
+        correctAnswer: 'Blue',
+        difficulty: '初級',
+        tags: ['色彩', 'RGB']
+      },
+      {
+        id: 'design_4',
+        type: 'quiz',
+        question: 'デザインの基本原則に含まれないものはどれですか？',
+        options: ['コントラスト', '反復', '近接', '複雑性'],
+        correctAnswer: '複雑性',
+        difficulty: '中級',
+        tags: ['デザイン原則', '基礎']
+      },
+      {
+        id: 'design_5',
+        type: 'quiz',
+        question: 'フォントの種類でセリフ体の特徴は？',
+        options: ['装飾的な線がある', '装飾的な線がない', '太字のみ', '斜体のみ'],
+        correctAnswer: '装飾的な線がある',
+        difficulty: '初級',
+        tags: ['フォント', 'タイポグラフィ']
       }
     ]
   },
@@ -87,6 +229,42 @@ const learningContent = {
         options: ['Product', 'Price', 'Place', 'People'],
         correctAnswer: 'People',
         difficulty: '中級',
+        tags: ['4P', '基礎']
+      },
+      {
+        id: 'mkt_2',
+        type: 'quiz',
+        question: '4PのProductは何を意味しますか？',
+        options: ['製品', '価格', '場所', '販促'],
+        correctAnswer: '製品',
+        difficulty: '初級',
+        tags: ['4P', '基礎']
+      },
+      {
+        id: 'mkt_3',
+        type: 'quiz',
+        question: '4PのPriceは何を意味しますか？',
+        options: ['価格', '製品', '場所', '販促'],
+        correctAnswer: '価格',
+        difficulty: '初級',
+        tags: ['4P', '基礎']
+      },
+      {
+        id: 'mkt_4',
+        type: 'quiz',
+        question: '4PのPlaceは何を意味しますか？',
+        options: ['流通', '価格', '製品', '販促'],
+        correctAnswer: '流通',
+        difficulty: '初級',
+        tags: ['4P', '基礎']
+      },
+      {
+        id: 'mkt_5',
+        type: 'quiz',
+        question: '4PのPromotionは何を意味しますか？',
+        options: ['販売促進', '価格', '製品', '流通'],
+        correctAnswer: '販売促進',
+        difficulty: '初級',
         tags: ['4P', '基礎']
       }
     ]
@@ -103,10 +281,48 @@ const learningContent = {
         correctAnswer: 'Return on Investment',
         difficulty: '中級',
         tags: ['ROI', '指標']
+      },
+      {
+        id: 'fin_2',
+        type: 'quiz',
+        question: 'ROEは何の略ですか？',
+        options: ['Return on Equity', 'Rate of Exchange', 'Risk of Equity', 'Revenue on Expense'],
+        correctAnswer: 'Return on Equity',
+        difficulty: '中級',
+        tags: ['ROE', '指標']
+      },
+      {
+        id: 'fin_3',
+        type: 'quiz',
+        question: 'NPVは何の略ですか？',
+        options: ['Net Present Value', 'New Product Value', 'Net Profit Value', 'Normal Price Value'],
+        correctAnswer: 'Net Present Value',
+        difficulty: '上級',
+        tags: ['NPV', '投資']
+      },
+      {
+        id: 'fin_4',
+        type: 'quiz',
+        question: 'IRRは何の略ですか？',
+        options: ['Internal Rate of Return', 'Interest Rate Ratio', 'Investment Risk Rate', 'Income Revenue Rate'],
+        correctAnswer: 'Internal Rate of Return',
+        difficulty: '上級',
+        tags: ['IRR', '投資']
+      },
+      {
+        id: 'fin_5',
+        type: 'quiz',
+        question: 'PERは何の略ですか？',
+        options: ['Price Earnings Ratio', 'Profit Expense Rate', 'Product Exchange Rate', 'Performance Evaluation Rate'],
+        correctAnswer: 'Price Earnings Ratio',
+        difficulty: '中級',
+        tags: ['PER', '株式']
       }
     ]
   }
 };
+
+// 以下は既存のMainAppコンポーネントと同じ内容...
 
 // メインアプリケーションコンポーネント
 const MainApp = () => {
@@ -370,3 +586,4 @@ function App() {
 }
 
 export default App;
+
