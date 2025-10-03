@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { learningContent } from '../data/learningContent';
 
 const StudySessionContext = createContext();
@@ -15,150 +15,118 @@ export const StudySessionProvider = ({ children }) => {
   const [currentSession, setCurrentSession] = useState({
     isActive: false,
     category: null,
-    mode: 'mixed', // 'flashcards', 'quiz', 'mixed'
-    sessionItems: [],
-    itemIndex: 0,
-    responses: [],
-    stats: {
-      correctAnswers: 0,
-      totalAnswers: 0,
-      timeSpent: 0
-    },
-    startTime: null
+    items: [],
+    currentIndex: 0,
+    correctAnswers: 0,
+    totalAnswers: 0,
+    startTime: null,
+    responses: []
   });
 
-  const [userProgress, setUserProgress] = useState({
-    programming: { attempted: 0, correct: 0, streak: 0 },
-    english: { attempted: 0, correct: 0, streak: 0 },
-    business: { attempted: 0, correct: 0, streak: 0 },
-    design: { attempted: 0, correct: 0, streak: 0 },
-    marketing: { attempted: 0, correct: 0, streak: 0 },
-    finance: { attempted: 0, correct: 0, streak: 0 }
-  });
-
-  const [detailedStats, setDetailedStats] = useState({
-    dailyStats: {},
-    weeklyGoals: {
-      targetMinutes: 300, // 5時間/週
-      currentMinutes: 59
-    },
-    streakData: {
-      currentStreak: 7,
-      longestStreak: 20
-    }
+  const [sessionStats, setSessionStats] = useState({
+    totalSessions: 0,
+    totalCorrect: 0,
+    totalQuestions: 0,
+    averageTime: 0,
+    longestStreak: 0
   });
 
   // セッション開始
-  const startSession = (categoryKey, mode = 'mixed', itemCount = 10) => {
+  const startSession = (categoryKey, mode = 'quiz', itemCount = 10) => {
     try {
+      console.log('Starting session for category:', categoryKey);
       const category = learningContent[categoryKey];
+      
       if (!category) {
         console.error('Category not found:', categoryKey);
         return;
       }
 
+      console.log('Category data:', category);
+      
       let sessionItems = [];
       
-      if (mode === 'flashcards') {
-        sessionItems = [...category.flashcards].slice(0, itemCount);
-      } else if (mode === 'quiz') {
+      // クイズが存在する場合のみ使用
+      if (category.quizzes && category.quizzes.length > 0) {
         sessionItems = [...category.quizzes].slice(0, itemCount);
       } else {
-        // mixed mode
-        const flashcards = category.flashcards.slice(0, Math.ceil(itemCount / 2));
-        const quizzes = category.quizzes.slice(0, Math.floor(itemCount / 2));
-        sessionItems = [...flashcards, ...quizzes].sort(() => Math.random() - 0.5);
+        console.warn('No quizzes available for category:', categoryKey);
+        return;
       }
+
+      console.log('Session items:', sessionItems);
 
       setCurrentSession({
         isActive: true,
         category: categoryKey,
-        mode,
-        sessionItems,
-        itemIndex: 0,
-        responses: [],
-        stats: {
-          correctAnswers: 0,
-          totalAnswers: 0,
-          timeSpent: 0
-        },
-        startTime: Date.now()
+        items: sessionItems,
+        currentIndex: 0,
+        correctAnswers: 0,
+        totalAnswers: 0,
+        startTime: Date.now(),
+        responses: []
       });
+
+      console.log('Session started successfully');
     } catch (error) {
       console.error('Error starting session:', error);
     }
   };
 
+  // 回答記録
+  const recordResponse = (response) => {
+    setCurrentSession(prev => ({
+      ...prev,
+      responses: [...prev.responses, response],
+      correctAnswers: prev.correctAnswers + (response.isCorrect ? 1 : 0),
+      totalAnswers: prev.totalAnswers + 1
+    }));
+  };
+
+  // 次の問題へ
+  const nextItem = () => {
+    setCurrentSession(prev => ({
+      ...prev,
+      currentIndex: prev.currentIndex + 1
+    }));
+  };
+
   // セッション終了
   const endSession = () => {
-    const endTime = Date.now();
-    const timeSpent = currentSession.startTime ? endTime - currentSession.startTime : 0;
-    
+    const sessionData = {
+      ...currentSession,
+      endTime: Date.now()
+    };
+
     // 統計更新
-    if (currentSession.category && currentSession.responses.length > 0) {
-      setUserProgress(prev => ({
-        ...prev,
-        [currentSession.category]: {
-          ...prev[currentSession.category],
-          attempted: prev[currentSession.category].attempted + currentSession.responses.length,
-          correct: prev[currentSession.category].correct + currentSession.stats.correctAnswers
-        }
-      }));
-    }
+    setSessionStats(prev => ({
+      ...prev,
+      totalSessions: prev.totalSessions + 1,
+      totalCorrect: prev.totalCorrect + sessionData.correctAnswers,
+      totalQuestions: prev.totalQuestions + sessionData.totalAnswers
+    }));
 
     setCurrentSession({
       isActive: false,
       category: null,
-      mode: 'mixed',
-      sessionItems: [],
-      itemIndex: 0,
-      responses: [],
-      stats: {
-        correctAnswers: 0,
-        totalAnswers: 0,
-        timeSpent: 0
-      },
-      startTime: null
+      items: [],
+      currentIndex: 0,
+      correctAnswers: 0,
+      totalAnswers: 0,
+      startTime: null,
+      responses: []
     });
-  };
 
-  // 回答記録
-  const recordResponse = (itemId, isCorrect, timeSpent = 0) => {
-    const newResponse = {
-      itemId,
-      isCorrect,
-      timeSpent,
-      timestamp: Date.now()
-    };
-
-    setCurrentSession(prev => ({
-      ...prev,
-      responses: [...prev.responses, newResponse],
-      stats: {
-        ...prev.stats,
-        correctAnswers: prev.stats.correctAnswers + (isCorrect ? 1 : 0),
-        totalAnswers: prev.stats.totalAnswers + 1,
-        timeSpent: prev.stats.timeSpent + timeSpent
-      }
-    }));
-  };
-
-  // 次のアイテムに進む
-  const nextItem = () => {
-    setCurrentSession(prev => ({
-      ...prev,
-      itemIndex: prev.itemIndex + 1
-    }));
+    return sessionData;
   };
 
   const value = {
     currentSession,
-    userProgress,
-    detailedStats,
+    sessionStats,
     startSession,
-    endSession,
     recordResponse,
-    nextItem
+    nextItem,
+    endSession
   };
 
   return (
